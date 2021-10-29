@@ -9,3 +9,5 @@ Paste [https://arduino.esp8266.com/stable/package_esp8266com_index.json](https:/
 into Additional Boards Manager URLs.
 
 Then, at **Tools > Boards > Boards manager** you can download the board.
+
+**Don't forget to put the board as aa esp8266!**
