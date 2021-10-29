@@ -16,3 +16,5 @@ For full documentation visit [mkdocs.org](https://www.mkdocs.org).
         index.md  # The documentation homepage.
         ...       # Other markdown pages, images and other files.
 
+## Publish this to Github Pages
+* `mkdocs gh-deploy` will publish whatever the branch you are currently working on. It will probably be cool to have a GitHub action.
