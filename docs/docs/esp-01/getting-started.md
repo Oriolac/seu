@@ -22,3 +22,7 @@ The switch button defines the state of the connection.
 - Developer mode to compile and put the code into the ESP01.
 - Supplier mode. The usb provides the energy to the ESP01.
 
+Arduino IDE configuration for ESP1:
+- Builtin Led: "1"
+
+
