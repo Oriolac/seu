@@ -1,14 +1,5 @@
-# Humidity Sensor DH11
-![DH11 sensor](./../img/dh11.jpg)
-## How it works
-
-## How to connect to ESP-01
-![DH11 sensor inputs](../img/dht11-inputs.png)
-
-## How to program it
-The following code can be found at `dh11.cpp`.
-```c++
-#include <dht11.h>
+#include <DHT_U.h>
+#include <DHT.h>
 
 dht11 DHT;
 // Pin 4 of Arduino to Data of DHT11
@@ -47,4 +38,3 @@ void loop() {
 
   delay(1000);
 }
-```
