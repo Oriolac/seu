@@ -1,5 +1,7 @@
 # Welcome to MkDocs
 
+![Diagram](img/prototype_proposal.png)
+
 For full documentation visit [mkdocs.org](https://www.mkdocs.org).
 
 ## Commands
