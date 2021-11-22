@@ -1,3 +1,8 @@
+/* Dataproducer 2
+ * 
+ * 
+ */
+
 #include <Adafruit_Sensor.h>
 
 #include <Adafruit_ADXL345_U.h>
@@ -18,11 +23,11 @@ void setup()
   lcd.begin(16, 2);     // 16 columnas por 2 lineas para LCD 1602A
   lcd.clear();      // limpia pantalla
   Serial.println("A");
-  if(!accel.begin())
+  if (!accel.begin())
   {
     /* There was a problem detecting the ADXL345 ... check your connections */
     Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
-    while(1);
+    while (1);
   }
   accel.setRange(ADXL345_RANGE_16_G);
 
@@ -30,17 +35,17 @@ void setup()
 
 void loop()
 {
-    Serial.println("B");
-    sensors_event_t event; 
+  Serial.println("B");
+  sensors_event_t event;
   accel.getEvent(&event);
   Serial.println("Displaying information: ");
-    Serial.print("X: "); Serial.print(event.acceleration.x); Serial.print("  ");
+  Serial.print("X: "); Serial.print(event.acceleration.x); Serial.print("  ");
   Serial.print("Y: "); Serial.print(event.acceleration.y); Serial.print("  ");
-  Serial.print("Z: "); Serial.print(event.acceleration.z); Serial.print("  ");Serial.println("m/s^2 ");
+  Serial.print("Z: "); Serial.print(event.acceleration.z); Serial.print("  "); Serial.println("m/s^2 ");
   lcd.setCursor(0, 0);    // ubica cursor en columna 0 y linea 0
-  lcd.print("X: "); 
+  lcd.print("X:");
   lcd.print(event.acceleration.x);
-  lcd.print("  Y: ");
+  lcd.print(" Y:");
   lcd.print(event.acceleration.y);// escribe el texto
   lcd.setCursor(0, 1);
   lcd.print("Z: ");
