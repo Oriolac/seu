@@ -16,8 +16,12 @@ User Story2: The user can see how many connections the mqtt broker has with dtp.
 UserStory1: The user must can see the LCD Screen connected to RPi
 UserStory2: The Supervision Station must 
 
-- chibiOS in RPi
+- install chibiOS in RPi
+- documentation chibiOS communication with I2C bus
+- documentation chibiOS communication with LCD Screen 
 - code of connection RPi to LCDScreen
-- 
+- supervision station analysis
+- connection esp01 of SS to MQTT Broker
+- Analysis I2C of arduino and RPi
 - Arduino connected with ESP01
 
