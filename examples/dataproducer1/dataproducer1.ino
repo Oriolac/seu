@@ -6,9 +6,9 @@
 #define maxX 127//159 
 #define maxY 63 //127
 
-const char* ssid = "LowiA37F";
-const char* password = "33XUAYNAKKPXFM";
-const char* mqtt_server = "192.168.0.26";
+const char* ssid = "ssid";
+const char* password = "password";
+const char* mqtt_server = "192.168.4.1";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
