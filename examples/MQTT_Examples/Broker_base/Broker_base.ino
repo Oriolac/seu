@@ -19,8 +19,7 @@ char pass[] = "password"; // your network password
 int counter = 0;
 
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println();
@@ -39,8 +38,7 @@ void setup()
 
 char str[80];
 
-void loop()
-{
+void loop() {
   sprintf(str, "Clients: %d", myBroker.getClientCount());
   myBroker.publish("broker/clients", str);
   // wait a second
