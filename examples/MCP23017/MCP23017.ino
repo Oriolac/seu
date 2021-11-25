@@ -22,6 +22,7 @@
 #define ODR    0x04 // 0b00000100 --> 1 Open Drain
 #define INTPOL 0x02 // 0b00000010 --> 1 INT Active High, INT 0 Active Low
 
+const int NUMBER_OF_LEDS = 4;
 
 void setup() {
   Serial.begin(9600); //9600bps
@@ -51,21 +52,22 @@ void setup() {
 
 }
 
+int toLedValue(int num) {
+  return int(pow(2, i) - 0.5)
+}
+
+void writeLeds(int num) {
+  Wire.beginTransmission(MCPADDRESS);
+  Wire.write(GPIOB);      // B Register
+  Wire.write(num);      // value to send - all HIGH
+  Wire.endTransmission();
+}
+
 void loop() {
-  Serial.println("LOW");
-  Wire.beginTransmission(MCPADDRESS);
-  Wire.write(GPIOB);      // B Register
-  Wire.write(0x00);      // value to send - all HIGH
-  Wire.endTransmission();
-
-  delay(5000);
-
-  Serial.println("HIGH");
-  Wire.beginTransmission(MCPADDRESS);
-  Wire.write(GPIOB);      // B Register
-  Wire.write(0xFF);      // value to send - all HIGH
-  Wire.endTransmission();
-
-  delay(5000);
-
+  for (int i = 0; i < NUMBER_OF_LED; i++) {
+    Serial.print("Set leds to: ");
+    int a = toLedValue(i);
+    writeLeds(a);
+    delay(5000);
+  }
 }
