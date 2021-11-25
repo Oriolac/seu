@@ -91,7 +91,7 @@ void setup() {
 }
 
 int toLedValue(int num) {
-  return int(pow(2, i) - 0.5)
+  return int(pow(2, num) - 0.5);
 }
 
 void writeLeds(int num) {
@@ -107,8 +107,9 @@ void loop() {
   sprintf(str, "Clients: %d", clients);
   myBroker.publish("broker/clients", str);
   // wait a second
-  int ledsValue = constrain(x, 0, NUMBER_OF_LEDS);
+  int ledsValue = constrain(clients, 0, NUMBER_OF_LEDS);
   sprintf(str, "Set leds to: %d", ledsValue);
-  writeLeds(ledsValue);
+  myBroker.publish("debug", str);
+  writeLeds(toLedValue(ledsValue));
   delay(1000);
 }
