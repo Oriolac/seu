@@ -53,7 +53,7 @@ void setup() {
 }
 
 int toLedValue(int num) {
-  return int(pow(2, i) - 0.5)
+  return int(pow(2, num) - 0.5);
 }
 
 void writeLeds(int num) {
@@ -64,10 +64,10 @@ void writeLeds(int num) {
 }
 
 void loop() {
-  for (int i = 0; i < NUMBER_OF_LED; i++) {
+  for (int i = 0; i <= NUMBER_OF_LEDS; i++) {
     Serial.print("Set leds to: ");
     int a = toLedValue(i);
     writeLeds(a);
-    delay(5000);
+    delay(1000);
   }
 }
