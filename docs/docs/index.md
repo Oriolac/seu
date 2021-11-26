@@ -1,15 +1,6 @@
-# Welcome to MkDocs
+# Wind Farm Project
 
 ![Diagram](img/prototype_proposal.png)
-
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
-
-## Commands
-
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
 
 ## Project layout
 
@@ -20,3 +11,11 @@ For full documentation visit [mkdocs.org](https://www.mkdocs.org).
 
 ## Publish this to Github Pages
 * `mkdocs gh-deploy` will publish whatever the branch you are currently working on. It will probably be cool to have a GitHub action.
+
+## Github Repository
+
+The link to the Github Repository can be found [here](https://github.com/Oriolac/seu/).
+
+## Github Project
+
+The link to the Github SCRUM Project can be found [here](https://github.com/users/Oriolac/projects/1).
