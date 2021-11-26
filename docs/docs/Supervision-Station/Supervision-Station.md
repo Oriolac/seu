@@ -16,4 +16,5 @@ The Supervision station has these requirements:
 
 - Maintenance manager requires graphically representation of the obtained sensor data, within the last 24h, in the Supervision Station.
 
-
+## ChibiOS
+In order to find more information of ChibiOS, go [here](chibios.md).
