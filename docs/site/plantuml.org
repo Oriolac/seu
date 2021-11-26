@@ -1,0 +1,42 @@
+#+TITLE: Generates images for everything
+
+#+begin_src plantuml :file img/mqtt-seq.png :dir .
+!theme materia
+
+producer -> nodemcu : sends information
+nodemcu --> nodemcu : enqueuees the information received, refreshes ttl
+nodemcu -> bus :ic2 bus informaton about how alive are the producers
+bus -> mcp23 : receives information
+mcp23 -> ledbar: receives information
+
+
+#+end_src
+
+#+RESULTS:
+[[file:img/mqtt-seq.png]]
+
+#+begin_src plantuml :file img/dataproducer2.png :dir .
+!theme materia
+
+esp -> bus : request accelerometer information
+bus -> sensor : request accelerometer information
+sensor --> bus : sends information
+bus --> esp : sends information
+esp -> bus : prints information on lcd display
+bus -> screen : prints information on lcd display
+
+#+end_src
+
+#+RESULTS:
+[[file:img/dataproducer2.png]]
+
+#+begin_src plantuml :file img/dataproducer1.png :dir .
+!theme materia
+esp -> sensor : Request values from the sensor
+sensor --> esp : Returns the value
+esp -> screen : prints the information
+esp -> mqtt : publishes the information
+#+end_src
+
+#+RESULTS:
+[[file:img/dataproducer1.png]]
