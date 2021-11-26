@@ -4,7 +4,7 @@ In this document, it will be described the LCD used in the dataproducer 2. First
 
 Secondly it will be detailed an example about how to use it.
 
-## Instalation
+## Instalation for arduino
 You should download a zip containing [this repository](https://github.com/fmalpartida/New-LiquidCrystal), as it is not on the library manager. Then you can install a zip using the IDE.
 
 ## Example 
@@ -42,3 +42,10 @@ void loop()
 
 
 ```
+
+## Problems with arduino and ESP01
+The library seemed to hardcode the pins that  would be used
+for communication. For this reason, ESP01, as it had different pins,
+didn't work at all when using the library. 
+
+Luckly for us, there was a library that already solved [this](https://github.com/agnunez/ESP8266-I2C-LCD1602). But the library itself had a weird bug for arduinos. As it seems, it's been a while since some library had a bug when printing strings: they ignored the code of the error returned by the write operation. In this case, it should return the number of bytes written, but instead, it returned always 0. For this reason, the.
