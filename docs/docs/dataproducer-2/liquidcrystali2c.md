@@ -48,7 +48,7 @@ The library seemed to hardcode the pins that  would be used
 for communication. For this reason, ESP01, as it had different pins,
 didn't work at all when using the library. 
 
-Luckly for us, there was a library that already solved [this](https://github.com/agnunez/ESP8266-I2C-LCD1602). But the library itself had a weird bug for arduinos. As it seems, it's been a while since some library had a bug when printing strings: they ignored the code of the error returned by the write operation. In this case, it should return the number of bytes written, but instead, it returned always 0. For this reason, we needed to modify the library. This can be used downloaded as a Zip at the libraries folder.
+Luckly for us, there was a library that already solved [this](https://github.com/agnunez/ESP8266-I2C-LCD1602). But the library itself had a weird bug for arduinos. As it seems, it's been a while since some library had a bug when printing strings: they ignored the code of the error returned by the write operation. In this case, it should return the number of bytes written, but instead, it returned always 0. For this reason, we needed to modify the library. The library with the change can be found and downloaded from [quimpm/LiquidCrystal_I2C](https://github.com/quimpm/LiquidCrystal_I2C).
 
 ## Wiring with fritzing
 
