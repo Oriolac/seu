@@ -36,7 +36,7 @@ static const uint8_t arduino_address = 0x04;
 typedef struct {
   float humidity;
   float temperature;
-  float theOtherOne;
+  float heatIndex;
 } dataproducer1;
 
 typedef struct {
@@ -45,11 +45,18 @@ typedef struct {
   float z;
 } dataproducer2;
 
-dataproducer1 dt1;
+
 dataproducer2 dt2;
+msg_t msgDt2;
+
+dataproducer1 dt1;
+msg_t msgDt1;
 
 static WORKING_AREA(waThread_LED1, 128);
-static WORKING_AREA(waThread_I2C, 128);
+static WORKING_AREA(waThread_I2C, 256);
+
+void printDataDt1(void);
+void printDataDt2(void);
 
 /**
  * Thread for LED1. It is mostly used so that I know the raspberry
@@ -63,67 +70,43 @@ static msg_t Thread_LED1(void *p) {
     chThdSleepMilliseconds(1000);
     palSetPad(GPIO25_PORT, GPIO25_PAD);
     chThdSleepMilliseconds(1000);
+    printDataDt1();
+    printDataDt2();
     // chThdYield();
   }
   return 0;
 }
-/**
- *Used for debug */
-void i2cSendCharacter(void) {
-  char c;
-  msg_t msg = i2cMasterReceiveTimeout(&I2C0, arduino_address,
-                                      (uint8_t *)&c,
-                                      sizeof(char), MS2ST(1000));
-  chThdSleepMilliseconds(500);
 
-  switch (msg) {
-  case Q_TIMEOUT:
-    chprintf((BaseSequentialStream *)&SD1, "Timeout");
-    break;
-  case Q_OK:
-    chprintf((BaseSequentialStream *)&SD1, "Received %d", c);
-    break;
-  case Q_RESET:
-    chprintf((BaseSequentialStream *)&SD1, "Reset: %d\n", msg);
-    i2cflags_t i2cFlags = i2cGetErrors(&I2C0);
-    chprintf((BaseSequentialStream *)&SD1, "Flags: %d\n", i2cFlags);
-    I2CConfig i2cConfig;
-    i2cStop(&I2C0);
-    i2cStart(&I2C0, &i2cConfig);
-    break;
-  default:
-    chprintf((BaseSequentialStream *)&SD1, "Default, should not happen");
-    break;
-  }
-
-  chprintf((BaseSequentialStream *)&SD1, "char=%d", c);
+void receiveSilentDt2(void) {
+  const uint8_t  t = 0x01;
+  msgDt2 = i2cMasterTransmitTimeout(&I2C0, arduino_address, &t, 1, (uint8_t *)&dt2,
+                                      sizeof(dataproducer2), MS2ST(1000));
+  chThdSleepMilliseconds(3500);
 }
 
-void receiveDt1(void) {
-  dataproducer1 data;
-  msg_t msg = i2cMasterReceiveTimeout(&I2C0, arduino_address,
-                                      (uint8_t *)&data,
-                                      sizeof(dataproducer1),
-                                      MS2ST(1000));
-  chThdSleepMilliseconds(500);
-  chprintf((BaseSequentialStream *)&SD1,
-           "Dt1(");
-  chprintf((BaseSequentialStream *)&SD1,
-           "humidity=%f", dt1.humidity);
-  chprintf((BaseSequentialStream *)&SD1,
-           ", temp=%f", dt1.temperature);
-  chprintf((BaseSequentialStream *)&SD1,
-           ", theO=%f)\n", dt1.theOtherOne);
-  chprintf((BaseSequentialStream *)&SD1, "size=%d\n", sizeof(dataproducer1));
-  switch (msg) {
+
+void receiveSilentDt1(void) {
+  const uint8_t  t = 0x00;
+  msgDt1 = i2cMasterTransmitTimeout(&I2C0, arduino_address, &t, 1, (uint8_t *)&dt1,
+                                   sizeof(dataproducer1), MS2ST(1000));
+  chThdSleepMilliseconds(3500);
+}
+
+void printDataDt2(void) {
+  chprintf((BaseSequentialStream *)&SD1, "Dt2(");
+  chprintf((BaseSequentialStream *)&SD1, "x=%d", dt2.x);
+  chprintf((BaseSequentialStream *)&SD1, ", y=%d", dt2.y);
+  chprintf((BaseSequentialStream *)&SD1, ", z=%d);", dt2.z);
+  chprintf((BaseSequentialStream *)&SD1, "size=%d\n", sizeof(dataproducer2));
+  switch (msgDt2) {
   case Q_TIMEOUT:
     chprintf((BaseSequentialStream *)&SD1, "Timeout\n");
     break;
   case Q_OK:
-    chprintf((BaseSequentialStream *)&SD1, "Received something\n");
+    chprintf((BaseSequentialStream *)&SD1, "Received Dt2\n");
     break;
   case Q_RESET:
-    chprintf((BaseSequentialStream *)&SD1, "Reset: %d\n", msg);
+    chprintf((BaseSequentialStream *)&SD1, "Reset: %d\n", msgDt1);
     i2cflags_t i2cFlags = i2cGetErrors(&I2C0);
     chprintf((BaseSequentialStream *)&SD1, "Flags: %d\n", i2cFlags);
     I2CConfig i2cConfig;
@@ -134,9 +117,47 @@ void receiveDt1(void) {
     chprintf((BaseSequentialStream *)&SD1, "Default, should not happen");
     break;
   }
-  dt1 = data;
-  chThdSleepMilliseconds(3000);
+
 }
+void printDataDt1(void) {
+  chprintf((BaseSequentialStream *)&SD1, "Dt1(");
+  chprintf((BaseSequentialStream *)&SD1, "humidity=");
+  chprintf((BaseSequentialStream *)&SD1, "%d", dt1.humidity);
+  chprintf((BaseSequentialStream *)&SD1, ", temp=%d", dt1.temperature);
+  chprintf((BaseSequentialStream *)&SD1, ", heatI=%d);", dt1.heatIndex);
+  chprintf((BaseSequentialStream *)&SD1, "size=%d\n", sizeof(dataproducer1));
+  switch (msgDt1) {
+  case Q_TIMEOUT:
+    chprintf((BaseSequentialStream *)&SD1, "Timeout\n");
+    break;
+  case Q_OK:
+    chprintf((BaseSequentialStream *)&SD1, "Received Dt1\n");
+    break;
+  case Q_RESET:
+    chprintf((BaseSequentialStream *)&SD1, "Reset: %d\n", msgDt1);
+    i2cflags_t i2cFlags = i2cGetErrors(&I2C0);
+    chprintf((BaseSequentialStream *)&SD1, "Flags: %d\n", i2cFlags);
+    I2CConfig i2cConfig;
+    i2cStop(&I2C0);
+    i2cStart(&I2C0, &i2cConfig);
+    break;
+  default:
+    chprintf((BaseSequentialStream *)&SD1, "Default, should not happen");
+    break;
+  }
+
+}
+
+void receiveSilently12Chars(void) {
+  char data[] = "asdfqwerzxcv";
+  msgDt1 = i2cMasterReceiveTimeout(&I2C0, arduino_address, (uint8_t *)&data,
+                                   12, MS2ST(1000));
+  chThdSleepMilliseconds(500);
+  chprintf((BaseSequentialStream *)&SD1, "deb=%s", data);
+  chThdSleepMilliseconds(3000);
+
+}
+
 
 /** Reads accelerometers information.
  *
@@ -147,10 +168,12 @@ static msg_t Thread_I2C(void *p) {
   chRegSetThreadName("Read all the information in I2C");
   dt1.humidity = 0.33f;
   dt1.temperature = 2.33f;
-  dt1.theOtherOne = 0.55f;
+  dt1.heatIndex = 0.55f;
   while (TRUE) {
     chprintf((BaseSequentialStream *)&SD1, "Receiving data...\n");
-    i2cSendCharacter();
+    receiveSilentDt1();
+    receiveSilentDt2();
+    // receiveSilently12Chars();
   }
   return 0;
 }
@@ -174,7 +197,7 @@ int main(void) {
   chThdCreateStatic(waThread_LED1, sizeof(waThread_LED1), HIGHPRIO, Thread_LED1,
                     NULL);
 
-  chThdCreateStatic(waThread_I2C, sizeof(waThread_I2C), HIGHPRIO, Thread_I2C,
+  chThdCreateStatic(waThread_I2C, sizeof(waThread_I2C), ABSPRIO, Thread_I2C,
                     NULL);
   // Blocks until finish
   chThdWait(chThdSelf());
