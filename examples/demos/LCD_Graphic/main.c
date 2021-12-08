@@ -21,6 +21,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "chprintf.h"
+#include "chvt.h"
 #include <string.h>
 
 #define N 10
@@ -37,11 +38,15 @@
 #define MAX_X 0x79
 #define MAX_Y_GRAPH 0x31
 
-#define GET_VALUE(field, comparation) res = data_units[0].field;                  \
-                                      for (int i = 1; i < length; i++) {          \
-                                        if (data_units[i].field comparation res)  \
-                                          res = data_units[i].field;              \
-                                      }
+#define GET_VALUE(field, comparation)        \
+  res = data_units[0].field;                 \
+  for (int i = 1; i < length; i++)           \
+  {                                          \
+    if (data_units[i].field comparation res) \
+      res = data_units[i].field;             \
+  }
+
+static const uint8_t arduino_address = 0x04;
 
 struct data_unit_t
 {
@@ -53,10 +58,29 @@ struct data_unit_t
   float accelerometerZ;
 };
 
+typedef struct
+{
+  float humidity;
+  float temperature;
+  float heatIndex;
+} dataproducer1;
+
+typedef struct
+{
+  float x;
+  float y;
+  float z;
+} dataproducer2;
+
 struct data_unit_t data_units[MAX_DATA_UNITS];
 int length;
 int num_dtp;
 struct data_t *data;
+dataproducer2 dt2;
+msg_t msgDt2;
+
+dataproducer1 dt1;
+msg_t msgDt1;
 
 float get_attribute(int state, int i);
 void drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
@@ -72,8 +96,11 @@ void add_data(float humidity, float temperature, float heat_index, float accelX,
 void shift_data(void);
 float get_min_value(int state);
 float get_max_value(int state);
+void printDataDt1(void);
 
+static WORKING_AREA(waThread_LED1, 128);
 static WORKING_AREA(waThread_LCD, 128);
+static WORKING_AREA(waThread_I2C, 256);
 
 static msg_t Thread_LCD(void *p)
 {
@@ -96,7 +123,8 @@ static msg_t Thread_LCD(void *p)
     display_float(min_val);
     max_val++;
     min_val--;
-    for (int i = length - 1; i > 0; i--) {
+    for (int i = length - 1; i > 0; i--)
+    {
       float last = get_attribute(state, i);
       float start = get_attribute(state, i - 1);
       int x_offset = MAX_DATA_UNITS - length + i;
@@ -106,7 +134,6 @@ static msg_t Thread_LCD(void *p)
       int y_start = (start - min_val) / (max_val - min_val) * MAX_Y_GRAPH;
       drawLine(x_start, y_start, x_last, y_last);
     }
-    add_data(length,length, length,length,length,length);
     state = (state + 1) % ACCEL_STATE_Z;
 
     chThdSleepMilliseconds(3000);
@@ -136,14 +163,13 @@ float get_attribute(int state, int i)
 
 void display_int(int i)
 {
-  chprintf((BaseSequentialStream *)&SD1, "%d", (int) i);
+  chprintf((BaseSequentialStream *)&SD1, "%d", (int)i);
   chThdSleepMilliseconds(500);
 }
 
-
 void display_float(float f)
 {
-  chprintf((BaseSequentialStream *)&SD1, "%f", (float) f);
+  chprintf((BaseSequentialStream *)&SD1, "%f", (float)f);
   chThdSleepMilliseconds(500);
 }
 
@@ -220,6 +246,73 @@ char *get_title(int state)
   }
 }
 
+void receiveSilentDt2(void)
+{
+  const uint8_t t = 0x01;
+  msgDt2 = i2cMasterTransmitTimeout(&I2C0, arduino_address, &t, 1, (uint8_t *)&dt2,
+                                    sizeof(dataproducer2), MS2ST(1000));
+  chThdSleepMilliseconds(3500);
+}
+
+void receiveSilentDt1(void)
+{
+  const uint8_t t = 0x00;
+  msgDt1 = i2cMasterTransmitTimeout(&I2C0, arduino_address, &t, 1, (uint8_t *)&dt1,
+                                    sizeof(dataproducer1), MS2ST(1000));
+  chThdSleepMilliseconds(3500);
+}
+
+static msg_t Thread_LED1(void *p)
+{
+  (void)p;
+  chRegSetThreadName("blinker-1");
+  while (TRUE)
+  {
+    printDataDt1();
+    chThdSleepMilliseconds(3500);
+    // chThdYield();
+  }
+  return 0;
+}
+
+void printDataDt1(void)
+{
+  add_data(dt1.humidity, dt1.temperature, dt1.heatIndex, dt2.x, dt2.y, dt2.z);
+  switch (msgDt1)
+  {
+  case Q_TIMEOUT:
+    break;
+  case Q_OK:
+    break;
+  case Q_RESET:
+    chprintf((BaseSequentialStream *)&SD1, "Reset: %d", msgDt1);
+    i2cflags_t i2cFlags = i2cGetErrors(&I2C0);
+    chprintf((BaseSequentialStream *)&SD1, "Flags: %d", i2cFlags);
+    I2CConfig i2cConfig;
+    i2cStop(&I2C0);
+    i2cStart(&I2C0, &i2cConfig);
+    break;
+  default:
+    break;
+  }
+}
+
+static msg_t Thread_I2C(void *p)
+{
+  (void)p;
+  chRegSetThreadName("Read all the information in I2C");
+  dt1.humidity = 0.33f;
+  dt1.temperature = 2.33f;
+  dt1.heatIndex = 0.55f;
+  while (TRUE)
+  {
+    receiveSilentDt1();
+    receiveSilentDt2();
+    // receiveSilently12Chars();
+  }
+  return 0;
+}
+
 /*
  * Application entry point.
  */
@@ -231,7 +324,17 @@ int main(void)
   length = 0;
 
   sdStart(&SD1, NULL);
+
+  I2CConfig i2cConfig;
+  i2cStart(&I2C0, &i2cConfig);
+
+  chThdCreateStatic(waThread_LED1, sizeof(waThread_LED1), HIGHPRIO, Thread_LED1,
+                    NULL);
+
   chThdCreateStatic(waThread_LCD, sizeof(waThread_LCD), HIGHPRIO, Thread_LCD, NULL);
+
+  chThdCreateStatic(waThread_I2C, sizeof(waThread_I2C), ABSPRIO, Thread_I2C,
+                    NULL);
 
   chThdWait(chThdSelf());
 
