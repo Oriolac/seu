@@ -38,12 +38,6 @@ Dictionary &data = *(new Dictionary(6));
 WiFiClient espClient;
 PubSubClient client(espClient);
 int value = 0;
-int x;
-int y;
-int z;
-int temp;
-int hum;
-int i_heat;
 char request;
 String response;
 
@@ -60,60 +54,40 @@ void setup_wifi() {
 }
 
 void callback(char* topic, byte* payload, unsigned int len) {
-  Serial.print("Callback called with: topic=");
-  Serial.print(topic);
-  Serial.print(", payload=");
-  char msg[len];
+  char msg[len+1];
   for (int i = 0; i < len; i++) {
     msg[i] = (char)payload[i];
   }
-  Serial.println(msg);
-  Serial.println(topic);
-  Serial.print("Character 21 == ");
-  Serial.println(topic[21]);
+  msg[len] = '\0';
   if(len > 21 && topic[21]  == '1'){
-    Serial.println("Message from Dataproducer1 Recibed");
-    Serial.println(msg);
     data("dataproducer1", msg);
     }else if (len > 21 && topic[21] == '2' ){
-    Serial.println("Message from Dataproducer1 Recibed");
-    Serial.println(msg);
     data("dataproducer2", msg);
   }
   data.remove("json");
   data("json", data.json());
-  Serial.print("Data temperature:");
-  Serial.println(data["temperature"]);
 }
 
 void setup() {
   pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
   Serial.begin(115200);
-  Serial.println("Connecting to mqtt");
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
   client.connect(clientID,clientUserName,clientPassword);
   client.subscribe("windmill/dataproducer1");
   client.subscribe("windmill/dataproducer2");
-  Serial.println("Suscribed to topics");
   mapper->insert("0", "ping");
   mapper->insert("1", "dataproducer1");
   mapper->insert("2", "dataproducer2");
   mapper->insert("j", "json");
   data("ping", "test");
-  Serial.println("Initialized mapper");
 }
 
 void loop() {
   client.loop();
   if(Serial.available()){
     request = (char)Serial.read();
-    Serial.print("request = ");
-    Serial.println(request);
-    Serial.print("response = ");
     Serial.println(data[mapper->search((String)request)]);
-    //Serial.println(response);
-    //Serial.write(response.c_str());
   }
 }
