@@ -44,7 +44,7 @@ int z;
 int temp;
 int hum;
 int i_heat;
-String request;
+char request;
 String response;
 
 
@@ -59,43 +59,61 @@ void setup_wifi() {
   randomSeed(micros());
 }
 
-void callback(char* topic, byte* payload, unsigned int length) {
-  char msg[sizeof(payload)];
-  for (int i = 0; i < length; i++) {
+void callback(char* topic, byte* payload, unsigned int len) {
+  Serial.print("Callback called with: topic=");
+  Serial.print(topic);
+  Serial.print(", payload=");
+  char msg[len];
+  for (int i = 0; i < len; i++) {
     msg[i] = (char)payload[i];
   }
-  if(topic == "windmill/dataproducer1"){
-    dataproducer1.jload(msg);
-  }else if (topic == "windmill/dataproducer2"){
-    dataproducer2.jload(msg);
+  Serial.println(msg);
+  Serial.println(topic);
+  Serial.print("Character 21 == ");
+  Serial.println(topic[21]);
+  if(len > 21 && topic[21]  == '1'){
+    Serial.println("Message from Dataproducer1 Recibed");
+    Serial.println(msg);
+    data("dataproducer1", msg);
+    }else if (len > 21 && topic[21] == '2' ){
+    Serial.println("Message from Dataproducer1 Recibed");
+    Serial.println(msg);
+    data("dataproducer2", msg);
   }
-  data.merge(dataproducer1);
-  data.merge(dataproducer2);
+  data.remove("json");
+  data("json", data.json());
+  Serial.print("Data temperature:");
+  Serial.println(data["temperature"]);
 }
 
 void setup() {
   pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
   Serial.begin(115200);
+  Serial.println("Connecting to mqtt");
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
   client.connect(clientID,clientUserName,clientPassword);
   client.subscribe("windmill/dataproducer1");
   client.subscribe("windmill/dataproducer2");
-  mapper->insert("0", "x");
-  mapper->insert("1", "y");
-  mapper->insert("2", "z");
-  mapper->insert("3", "humidity");
-  mapper->insert("4", "temperature");
-  mapper->insert("5", "hic");
+  Serial.println("Suscribed to topics");
+  mapper->insert("0", "ping");
+  mapper->insert("1", "dataproducer1");
+  mapper->insert("2", "dataproducer2");
+  mapper->insert("j", "json");
+  data("ping", "test");
+  Serial.println("Initialized mapper");
 }
 
 void loop() {
   client.loop();
-  delay(10);
   if(Serial.available()){
-    request = (String)Serial.read();
-    response = data[mapper->search(request)];
-    Serial.write(response.c_str());
+    request = (char)Serial.read();
+    Serial.print("request = ");
+    Serial.println(request);
+    Serial.print("response = ");
+    Serial.println(data[mapper->search((String)request)]);
+    //Serial.println(response);
+    //Serial.write(response.c_str());
   }
 }
