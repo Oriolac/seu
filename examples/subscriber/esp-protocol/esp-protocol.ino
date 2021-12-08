@@ -54,11 +54,12 @@ void setup_wifi() {
 }
 
 void callback(char* topic, byte* payload, unsigned int len) {
-  char msg[len+1];
+  char msg[len+2];
   for (int i = 0; i < len; i++) {
     msg[i] = (char)payload[i];
   }
-  msg[len] = '\0';
+  msg[len] = ';';
+  msg[len+1] = '\0';
   if(len > 21 && topic[21]  == '1'){
     data("dataproducer1", msg);
     }else if (len > 21 && topic[21] == '2' ){
@@ -82,6 +83,7 @@ void setup() {
   mapper->insert("2", "dataproducer2");
   mapper->insert("j", "json");
   data("ping", "test");
+  Serial.print("i");
 }
 
 void loop() {
