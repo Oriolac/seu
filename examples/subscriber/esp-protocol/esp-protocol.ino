@@ -31,10 +31,10 @@ const char* mqtt_server = "192.168.4.1";
 const char* clientID = "consumer";
 const char* clientUserName = "consumer";
 const char* clientPassword = "password";
-
-Dictionary *dataproducer1 = new Dictionary(3);
-Dictionary *dataproducer2 = new Dictionary(3);
-Dictionary *data = new Dictionary(6);
+Dictionary *mapper = new Dictionary(6);
+Dictionary &dataproducer1 = *(new Dictionary(3));
+Dictionary &dataproducer2 = *(new Dictionary(3));
+Dictionary &data = *(new Dictionary(6));
 WiFiClient espClient;
 PubSubClient client(espClient);
 int value = 0;
@@ -44,7 +44,8 @@ int z;
 int temp;
 int hum;
 int i_heat;
-char* request[10];
+String request;
+String response;
 
 
 void setup_wifi() {
@@ -64,12 +65,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
     msg[i] = (char)payload[i];
   }
   if(topic == "windmill/dataproducer1"){
-    dataproducer1->jload(msg);
+    dataproducer1.jload(msg);
   }else if (topic == "windmill/dataproducer2"){
-    dataproducer2->jload(msg);
+    dataproducer2.jload(msg);
   }
-  data->merge(dataproducer1);
-  data->merge(dataproducer2);
+  data.merge(dataproducer1);
+  data.merge(dataproducer2);
 }
 
 void setup() {
@@ -81,14 +82,20 @@ void setup() {
   client.connect(clientID,clientUserName,clientPassword);
   client.subscribe("windmill/dataproducer1");
   client.subscribe("windmill/dataproducer2");
+  mapper->insert("0", "x");
+  mapper->insert("1", "y");
+  mapper->insert("2", "z");
+  mapper->insert("3", "humidity");
+  mapper->insert("4", "temperature");
+  mapper->insert("5", "hic");
 }
 
 void loop() {
-
   client.loop();
   delay(10);
   if(Serial.available()){
-    request = Serial.read();
-    Serial.write(data[request]);
+    request = (String)Serial.read();
+    response = data[mapper->search(request)];
+    Serial.write(response.c_str());
   }
 }
