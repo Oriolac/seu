@@ -69,6 +69,19 @@ void callback(char* topic, byte* payload, unsigned int len) {
   data("json", data.json());
 }
 
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    // Attempt to connect
+    if (!client.connect(clientID)) {
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }else{
+      Serial.write('i');
+    }
+  }
+}
+
 void setup() {
   pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
   Serial.begin(115200);
@@ -83,10 +96,13 @@ void setup() {
   mapper->insert("2", "dataproducer2");
   mapper->insert("j", "json");
   data("ping", "test");
-  Serial.print("i");
+  Serial.write('i');
 }
 
 void loop() {
+  if(!client.connected()){
+    reconnect();
+  }
   client.loop();
   if(Serial.available()){
     request = (char)Serial.read();
