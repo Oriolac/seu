@@ -26,7 +26,7 @@
 /*
 ** Constants.
 */
-static const uint8_t arduino_address = 0x33;
+static const uint8_t arduino_address = 0x04;
 /*
 ** Data structures that will be used on the threads and global
 ** instantiation.
@@ -64,9 +64,78 @@ static msg_t Thread_LED1(void *p) {
     palSetPad(GPIO25_PORT, GPIO25_PAD);
     chThdSleepMilliseconds(1000);
     // chThdYield();
-    chprintf((BaseSequentialStream *)&SD1, "Damn, it works\n");
   }
   return 0;
+}
+/**
+ *Used for debug */
+void i2cSendCharacter(void) {
+  char c;
+  msg_t msg = i2cMasterReceiveTimeout(&I2C0, arduino_address,
+                                      (uint8_t *)&c,
+                                      sizeof(char), MS2ST(1000));
+  chThdSleepMilliseconds(500);
+
+  switch (msg) {
+  case Q_TIMEOUT:
+    chprintf((BaseSequentialStream *)&SD1, "Timeout");
+    break;
+  case Q_OK:
+    chprintf((BaseSequentialStream *)&SD1, "Received %d", c);
+    break;
+  case Q_RESET:
+    chprintf((BaseSequentialStream *)&SD1, "Reset: %d\n", msg);
+    i2cflags_t i2cFlags = i2cGetErrors(&I2C0);
+    chprintf((BaseSequentialStream *)&SD1, "Flags: %d\n", i2cFlags);
+    I2CConfig i2cConfig;
+    i2cStop(&I2C0);
+    i2cStart(&I2C0, &i2cConfig);
+    break;
+  default:
+    chprintf((BaseSequentialStream *)&SD1, "Default, should not happen");
+    break;
+  }
+
+  chprintf((BaseSequentialStream *)&SD1, "char=%d", c);
+}
+
+void receiveDt1(void) {
+  dataproducer1 data;
+  msg_t msg = i2cMasterReceiveTimeout(&I2C0, arduino_address,
+                                      (uint8_t *)&data,
+                                      sizeof(dataproducer1),
+                                      MS2ST(1000));
+  chThdSleepMilliseconds(500);
+  chprintf((BaseSequentialStream *)&SD1,
+           "Dt1(");
+  chprintf((BaseSequentialStream *)&SD1,
+           "humidity=%f", dt1.humidity);
+  chprintf((BaseSequentialStream *)&SD1,
+           ", temp=%f", dt1.temperature);
+  chprintf((BaseSequentialStream *)&SD1,
+           ", theO=%f)\n", dt1.theOtherOne);
+  chprintf((BaseSequentialStream *)&SD1, "size=%d\n", sizeof(dataproducer1));
+  switch (msg) {
+  case Q_TIMEOUT:
+    chprintf((BaseSequentialStream *)&SD1, "Timeout\n");
+    break;
+  case Q_OK:
+    chprintf((BaseSequentialStream *)&SD1, "Received something\n");
+    break;
+  case Q_RESET:
+    chprintf((BaseSequentialStream *)&SD1, "Reset: %d\n", msg);
+    i2cflags_t i2cFlags = i2cGetErrors(&I2C0);
+    chprintf((BaseSequentialStream *)&SD1, "Flags: %d\n", i2cFlags);
+    I2CConfig i2cConfig;
+    i2cStop(&I2C0);
+    i2cStart(&I2C0, &i2cConfig);
+    break;
+  default:
+    chprintf((BaseSequentialStream *)&SD1, "Default, should not happen");
+    break;
+  }
+  dt1 = data;
+  chThdSleepMilliseconds(3000);
 }
 
 /** Reads accelerometers information.
@@ -79,41 +148,9 @@ static msg_t Thread_I2C(void *p) {
   dt1.humidity = 0.33f;
   dt1.temperature = 2.33f;
   dt1.theOtherOne = 0.55f;
-  char c;
   while (TRUE) {
-    // i2cMasterTransmitTimeout(&I2C0, arduino_address, NULL, 0, (uint8_t
-    // *)&dt1,
-    //                          sizeof(dataproducer1), MS2ST(1000));
-    msg_t msg =
-        i2cMasterTransmitTimeout(&I2C0, arduino_address, NULL, 0, (uint8_t *)&c,
-                                 sizeof(char), MS2ST(5000));
-    chThdSleepMilliseconds(500);
-
-    switch (msg) {
-    case Q_TIMEOUT:
-      chprintf((BaseSequentialStream *)&SD1, "Timeout");
-      break;
-    case Q_OK:
-      chprintf((BaseSequentialStream *)&SD1, "Received %d", c);
-      break;
-    case Q_RESET:
-      chprintf((BaseSequentialStream *)&SD1, "Reset: %d\n", msg);
-      i2cflags_t i2cFlags = i2cGetErrors(&I2C0);
-      chprintf((BaseSequentialStream *)&SD1, "Flags: %d\n", i2cFlags);
-      break;
-    default:
-      chprintf((BaseSequentialStream *)&SD1, "Default, should not happen");
-      break;
-    }
-
-    chprintf((BaseSequentialStream *)&SD1, "char=%d", c);
-    // chprintf((BaseSequentialStream *)&SD1,
-    //          "Dataproducer1(humidity=%f, temperature=%f, theOtherOne=%f)\n",
-    //          dt1.humidity, dt1.temperature, dt1.theOtherOne);
-    // chprintf((BaseSequentialStream *)&SD1,
-    //          "SizeOf(dataproducer1) = %d",
-    //          sizeof(dataproducer1));
-    chThdSleepMilliseconds(1000);
+    chprintf((BaseSequentialStream *)&SD1, "Receiving data...\n");
+    i2cSendCharacter();
   }
   return 0;
 }
