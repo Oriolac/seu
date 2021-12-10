@@ -26,7 +26,7 @@ It shall be described the sequence diagrams used in the supervision station.
 ![Arduino and ChibiOS communication](./img/chibios-arduino.png)
 
 ### Arduino and ESP01 communication
-![Arduino and ESP01 communication](./img/arduino-esp01.png)
+![Arduino and ESP01 communication](./img/arduino-esp.png)
 
 ## ChibiOS
 In order to find more information of ChibiOS, go [here](chibios.md).
