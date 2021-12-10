@@ -65,7 +65,7 @@ void changeState(int numBytes) {
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Wire.begin(ARDUINO_ADDR);
   Wire.onRequest(senddataproducer);
   Wire.onReceive(changeState);
