@@ -40,3 +40,34 @@ esp -> mqtt : publishes the information
 
 #+RESULTS:
 [[file:img/dataproducer1.png]]
+
+#+begin_src plantuml :file img/chibios-arduino.png :dir .
+!theme cyborg
+
+ChibiOS -> Arduino : Establish Connection
+ChibiOS -> Arduino : Sends a message for setting the dataproducer for next request
+note over ChibiOS, Arduino: Subscriber execution
+Arduino -> Arduino : Parses the message and actualizes state
+ChibiOS -> Arduino : Request the data
+Arduino -> ChibiOS : Sends Data
+ChibiOS -> ChibiOS : Parses the data
+ChibiOS -> "LCD Screen" : Write the Data
+#+end_src
+
+#+RESULTS:
+[[file:img/chibios-arduino.png]]
+
+#+begin_src plantuml :file img/arduino-esp.png :dir .
+!theme cyborg
+loop
+MQTTBroker -> Subscriber : Recives information on the chanels that is subscribet to
+Subscriber -> Subscriber : Actualizes State
+end
+loop
+Arduino -> Subscriber : Requests Data
+Subscriber -> Arduino : Sends Data
+end
+#+end_src
+
+#+RESULTS:
+[[file:img/arduino-esp.png]]
