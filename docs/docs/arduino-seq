@@ -1,0 +1,13 @@
+@startuml
+!theme cyborg
+
+ChibiOS -> Arduino : Establish Connection
+ChibiOS -> Arduino : Sends a message for setting the dataproducer for next request
+group Subscriber Communication
+end
+Arduino -> Arduino : Parses the message and actualizes state
+ChibiOS -> Arduino : Request the data
+Arduino -> ChibiOS : Sends Data
+ChibiOS -> ChibiOS : Parses the data 
+ChibiOS -> LCD Screen : Write the Data
+@enduml

@@ -54,11 +54,12 @@ void setup_wifi() {
 }
 
 void callback(char* topic, byte* payload, unsigned int len) {
-  char msg[len+1];
+  char msg[len+2];
   for (int i = 0; i < len; i++) {
     msg[i] = (char)payload[i];
   }
-  msg[len] = '\0';
+  msg[len] = ';';
+  msg[len+1] = '\0';
   if(len > 21 && topic[21]  == '1'){
     data("dataproducer1", msg);
     }else if (len > 21 && topic[21] == '2' ){
@@ -66,6 +67,19 @@ void callback(char* topic, byte* payload, unsigned int len) {
   }
   data.remove("json");
   data("json", data.json());
+}
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    // Attempt to connect
+    if (!client.connect(clientID)) {
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }else{
+      Serial.write('i');
+    }
+  }
 }
 
 void setup() {
@@ -82,9 +96,13 @@ void setup() {
   mapper->insert("2", "dataproducer2");
   mapper->insert("j", "json");
   data("ping", "test");
+  Serial.write('i');
 }
 
 void loop() {
+  if(!client.connected()){
+    reconnect();
+  }
   client.loop();
   if(Serial.available()){
     request = (char)Serial.read();
