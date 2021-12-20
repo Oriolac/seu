@@ -130,6 +130,30 @@ int main(void) {
 }
 ```
 
+The LCD Screen has some several issues about printing the floats, so it has been changed the `chprintf.h`, specifically, `ftoa` to not only change the precision of the float but also fix some bugs:
+
+```c
+#define FLOAT_PRECISION 100
+
+static char *ftoa(char *p, double num) {
+  long l;
+  unsigned long precision = FLOAT_PRECISION;
+
+  l = (long) num;
+  p = long_to_string_with_divisor(p, l, 10, 0);
+  *p++ = '.';
+  l = (long)((num - l) * precision);
+  return long_to_string_with_divisor(p, l, 10, precision / 10);
+}
+```
+
+Also, some macros have been created in order to set the different consants such as the total number of data saved in every dataproducer (20), or graphic LCD constants:
+```cpp
+#define MAX_DATA_UNITS 20
+#define START_DRAW_X 0x1D
+#define MAX_X 0x79
+#define MAX_Y_GRAPH 0x31
+```
 
 ## Arduino I2C
 
