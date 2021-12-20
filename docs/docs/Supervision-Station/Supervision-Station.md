@@ -20,6 +20,13 @@ As the last 24 hours is hard to debug, it is shown instead the last 24 values in
 ## The schema
 ![The schematic of the supervision station](./img/chibi-esp-arduino.png)
 
+## Sequence diagram
+It shall be described the sequence diagrams used in the supervision station.
+### ChibiOS and Arduino communication
+![Arduino and ChibiOS communication](./img/chibios-arduino.png)
+
+### Arduino and ESP01 communication
+![Arduino and ESP01 communication](./img/arduino-esp.png)
 
 ## ChibiOS
 In order to find more information of ChibiOS, go [here](chibios.md).
