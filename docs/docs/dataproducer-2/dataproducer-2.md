@@ -10,12 +10,12 @@
 
 ## Wiring
 ![Data producer 2](../img/dto2-esp.png)
+
+
 ## Examples that is based the code
 - Broker publisher example
 - LED I2C display example
 - Accelerometer example
-
-## Wires
 
 ## Code
 
