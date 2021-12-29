@@ -1,0 +1,13 @@
+@startuml chibi-arduino
+!theme cerulean
+skinparam BackgroundColor #FFFFFF
+
+ChibiOS -> Arduino: Establish Connection
+ChibiOS -> Arduino: Sends Message for setting the dataproducer next request
+note over Arduino : Subscriber execution
+Arduino -> Arduino: Parses the message and updates the state
+ChibiOS -> Arduino: Request the data
+Arduino -> ChibiOS: Sends the data struct
+ChibiOS -> ChibiOS: Parses the data
+ChibiOS -> "LCD Screen" : Displays the data
+@enduml

@@ -23,7 +23,7 @@ As the last 24 hours is hard to debug, it is shown instead the last 24 values in
 ## Sequence diagram
 It shall be described the sequence diagrams used in the supervision station.
 ### ChibiOS and Arduino communication
-![Arduino and ChibiOS communication](./img/chibios-arduino.png)
+![Arduino and ChibiOS communication](./img/chibi-arduino.png)
 
 ### Arduino and ESP01 communication
 ![Arduino and ESP01 communication](./img/arduino-esp.png)

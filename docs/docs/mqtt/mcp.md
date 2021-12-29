@@ -2,8 +2,6 @@
 
 The MCP was quite easy to develop, but the cable management was hard. We would advise to follow a schematic and doing it calmly.
 
-## Wires
-
 ## Code
 We used tried some libraries to work with the MCP23027, as using adafruit MCP23027, but it didn't seem to work for us. At the end, we used Wire and the plain protocol.
 
