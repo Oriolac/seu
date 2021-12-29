@@ -2,6 +2,7 @@
 This component has a library to perform some its funcionality, but it has a worse API than calling the serial backbones.
 
 For example, the library calls directly in most of the endpoints to the same serial method:
+
 ```cpp
 void LCD::printStr(char Str[78])//26 characters is the length of one line on the LCD
 {
@@ -26,10 +27,21 @@ Instead, our program was base on the libarary to get the operations and used ser
 
 Finally, this example was made for an arduino mega, as it supports more than one serial so that the program could be debuged in the computer.
 
+[DataSheets Technical Docs](https://cv.udl.cat/access/content/group/103056-2122/Datasheets%20_%20Technical%20docs./SerialGraphicLCD-v2.pdf)
 
+## Library
+
+Library: [SparkFun Graphic LCD Serial Backpack](https://github.com/sparkfun/GraphicLCD_Serial_Backpack)
+
+### How it works
+
+You give the information of the pointer to start writing and, then, give the string.
 
 ## Connexions
 
+The Rx of the LCD must be the Tx of the board and the other way around. 
+
+![LCD Screen RxTx](../img/lcdscreen_rxtx.jpg)
 
 ## Example
 
