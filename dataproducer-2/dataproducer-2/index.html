@@ -369,6 +369,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#wires" class="md-nav__link">
+    Wires
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code" class="md-nav__link">
+    Code
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -626,6 +640,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#wires" class="md-nav__link">
+    Wires
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code" class="md-nav__link">
+    Code
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -655,6 +683,118 @@
 <li>LED I2C display example</li>
 <li>Accelerometer example</li>
 </ul>
+<h2 id="wires">Wires</h2>
+<h2 id="code">Code</h2>
+<pre><code class="language-cpp">#include &lt;LiquidCrystal_I2C.h&gt;
+
+/* Dataproducer 2
+ * 
+ * 
+ */
+
+#include &lt;Adafruit_Sensor.h&gt;
+
+#include &lt;Adafruit_ADXL345_U.h&gt;
+
+#include &lt;Wire.h&gt;      // libreria de comunicacion por I2C
+#include &lt;ESP8266WiFi.h&gt;
+#include &lt;PubSubClient.h&gt;
+
+const char* ssid = &quot;ssid&quot;;
+const char* password = &quot;password&quot;;
+const char* mqtt_server = &quot;192.168.4.1&quot;;
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+unsigned long lastMsg = 0;
+#define MSG_BUFFER_SIZE  (50)
+char msg[MSG_BUFFER_SIZE];
+
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);  // DIR, E, RW, RS, D4, D5, D6, D7
+
+void setup_wifi() {
+
+  delay(10);
+
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+  }
+
+  randomSeed(micros());
+
+}
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    // Create a random client ID
+    String clientId = &quot;ESP8266Client-&quot;;
+    clientId += String(random(0xffff), HEX);
+    // Attempt to connect
+    if (client.connect(clientId.c_str())) {
+      client.publish(&quot;debug&quot;,&quot;connected&quot;);
+      client.publish(&quot;outTopic&quot;, &quot;hello world&quot;);
+    } else {
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
+void setup()
+{
+  Serial.begin(115200);
+  setup_wifi();
+  client.setServer(mqtt_server, 1883);
+  client.publish(&quot;debug&quot;, &quot;Setting LCD communication&quot;);
+  lcd.setBacklight(HIGH);   // habilita iluminacion posterior de LCD
+  lcd.begin(0, 2);     // 16 columnas por 2 lineas para LCD 1602A
+  lcd.clear();      // limpia pantalla
+  if (!accel.begin())
+  {
+    /* There was a problem detecting the ADXL345 ... check your connections */
+    client.publish(&quot;debug&quot;, &quot;Ooops, no ADXL345 detected ... Check your wiring!&quot;);
+    while (1);
+  }
+  accel.setRange(ADXL345_RANGE_16_G);
+
+}
+
+void loop()
+{
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+
+  sensors_event_t event;
+  accel.getEvent(&amp;event);
+  client.publish(&quot;debug&quot;, &quot;Displaying information at LCD SCReen: &quot;);
+  lcd.setCursor(0, 0);    // ubica cursor en columna 0 y linea 0
+  lcd.print(&quot;X:&quot;);
+  lcd.print(event.acceleration.x);
+  lcd.print(&quot; Y:&quot;);
+  lcd.print(event.acceleration.y);// escribe el texto
+  lcd.setCursor(0, 1);
+  lcd.print(&quot;Z: &quot;);
+  lcd.print(event.acceleration.z);// ubica cursor en columna 0 y linea 1
+  unsigned long now = millis();
+  if (now - lastMsg &gt; 2000) {
+    sprintf(msg, &quot;{\&quot;X\&quot;:%f,\&quot;Y\&quot;:%f,\&quot;Z\&quot;:%f}&quot;, event.acceleration.x, event.acceleration.y, event.acceleration.z);
+    client.publish(&quot;debug&quot;, &quot;Published message&quot;);
+    client.publish(&quot;debug&quot;,&quot;Publish message: &quot;);
+    client.publish(&quot;debug&quot;,msg);
+    client.publish(&quot;windmill/dataproducer2&quot;, msg);
+  }
+  client.publish(&quot;debug&quot;, &quot;Finished Message Sending&quot;);
+  delay(2500);
+}
+</code></pre>
                 
               
               
