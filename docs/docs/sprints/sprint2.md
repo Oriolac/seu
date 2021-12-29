@@ -1,6 +1,6 @@
 # Sprint 2
 
-The first sprint was held from 13th October to 26th November.
+The second sprint was held from 13th October to 26th November.
 
 ## User Stories
 

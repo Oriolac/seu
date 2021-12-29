@@ -1,6 +1,6 @@
 # Sprint 3
 
-The first sprint was held from 27th October to 10th December.
+The third sprint was held from 27th October to 10th December.
 
 ## User Stories
 
