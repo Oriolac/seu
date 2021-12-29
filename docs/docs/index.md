@@ -1,6 +1,6 @@
 # Wind Farm Project
 
-![Diagram](docs/docs/img/prototype_proposal.png)
+![Diagram](img/prototype_proposal.png)
 
 ## Project layout
 ```
