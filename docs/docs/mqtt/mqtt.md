@@ -9,7 +9,16 @@ An Arduino forum commented that most USB cables are no thought for data transfer
 - MCP23017
 - Segment LED bar
 ### Flux
+
 ![MQTT Sequence](../img/mqtt-seq.png)
+
+## Wires
+
+![Wires on the MQTT Broker](../img/mqtt.png)
+
+## Topics Tree
+
+![Wires on the MQTT Broker](../img/topics.png)
 
 ## Code
 ```cpp
@@ -129,7 +138,3 @@ void loop() {
   delay(1000);
 }
 ```
-
-## Wires
-
-![Wires on the MQTT Broker](../img/mqtt.png)
