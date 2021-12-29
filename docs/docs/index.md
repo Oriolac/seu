@@ -35,3 +35,5 @@ The link to the Github SCRUM Project can be found [here](https://github.com/user
 - [Sprint 1](https://docs.google.com/presentation/d/15G14suaCFX4XvX2A6YMgebiaef3y8DuZf9PoxsEkkZk/edit?usp=sharing)
 - [Sprint 2](https://docs.google.com/presentation/d/1AQJoerh7DT9Wxh1N1sOndmkQTvIrPiEeq6F_IczKm0E/edit?usp=sharing)
 - [Sprint 3](https://docs.google.com/presentation/d/1_hAJdyse-bvGyyvQKseHs7tA3uVKPcMMpttPS8yRY5Y/edit?usp=sharing)
+- [Project Status](https://docs.google.com/presentation/d/1G-xTKVLNVrDCJe4sMIDWfF5-vzm7uo_bQU3AHQ219gA/edit?usp=sharing)
+- [Final Presentation](https://docs.google.com/presentation/d/1bu9iBA_TxmYC0QDlKc_HDnVTmwzY0Lheo47ExVUBQWI/edit?usp=sharing)
