@@ -1,4 +1,4 @@
-# Broker
+# Getting started with uMQTTBroker
 
 We based the broker for our project as the example given by the professor. We have the libraries used by them at the libraries folder.
 
