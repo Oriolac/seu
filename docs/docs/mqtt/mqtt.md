@@ -1,5 +1,5 @@
 # MQTT Broker
-## Weird problems that be encountered
+## Weird problems that were encountered
 Some USB cables didn't work at all to write the program in the nodeMCU. It was a lost of time to understand why did that happen, and, in the end, we had to buy some cables to go around it.
 
 An Arduino forum commented that most USB cables are no thought for data transfering but just for charging a mobile battery. In those cases, the cable has only two wires inside, but in the data transfering cables, it usually has 4. For mobiles and similar devices, it only affects that the data trasference is slower, but NodeMCU is not able to use 2 wires only, and needs to have the 4 of them.
@@ -9,7 +9,7 @@ An Arduino forum commented that most USB cables are no thought for data transfer
 - MCP23017
 - Segment LED bar
 ### Flux
-![MQTT Sequence](./img/mqtt-seq.png)
+![MQTT Sequence](../img/mqtt-seq.png)
 
 ## Code
 ```cpp
@@ -131,3 +131,5 @@ void loop() {
 ```
 
 ## Wires
+
+![Wires on the MQTT Broker](../img/mqtt.png)
