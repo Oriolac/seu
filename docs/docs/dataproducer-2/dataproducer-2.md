@@ -1,4 +1,7 @@
 # Data producer 2
+
+The Dataproducer 2 must receive the data from the accelerometer and display the data to a LCD Display via I2C protocol. In addition, the data must be sent to the MQTT Broker.
+
 ## Components
 - ESP-01
 - I2C bus

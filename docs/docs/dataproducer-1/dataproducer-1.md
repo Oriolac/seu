@@ -1,4 +1,8 @@
 # Dataproducer 1
+
+The Dataproducer 2 must receive the data of the temperature and humidity sensor and display it to the LCD Screen using the serial port. In addition, the data must be sent to the MQTT Broker.
+
+
 ## Components
 - Temperature and humidity sensor
 - LCD screen
